@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cat Catastrophe Run</title>
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    background: #4fc3f7;
+  }
+  h1 {
+    font-size: 48px;
+    margin-top: 20px;
+  }
+  #challenges {
+    margin-top: 20px;
+  }
+  .challenge-btn {
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: #ffd166;
+    border: 5px solid #333;
+    margin: 15px;
+    font-size: 60px;
+    cursor: pointer;
+  }
+  #cat {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 300px;
+    line-height: 1;
+  }
+  #equipped {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 90px;
+    pointer-events: none;
+  }
+  #owner {
+    margin-top: 10px;
+    font-size: 90px;
+    line-height: 1;
+  }
+  .swatch-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 4px solid #333;
+    cursor: pointer;
+  }
+  .swatch-btn.selected {
+    box-shadow: 0 0 0 4px #8ac926;
+  }
+  #hair-color-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 500px;
+    margin: 15px auto;
+  }
+
+  /* customize screen */
+  #customize-screen {
+    display: none;
+  }
+  #customize-screen h2 {
+    font-size: 36px;
+  }
+  #category-btns {
+    margin: 10px 0;
+  }
+  .category-btn {
+    font-size: 24px;
+    padding: 12px 24px;
+    margin: 0 10px;
+    border-radius: 16px;
+    border: 4px solid #333;
+    background: #fff;
+    cursor: pointer;
+  }
+  .category-btn.active {
+    background: #ffd166;
+  }
+  #accessory-list, #owner-item-list, #obstacle-pieces {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 600px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 20px auto;
+    padding: 10px;
+    border: 3px solid #333;
+    border-radius: 16px;
+    background: #f4f4f4;
+  }
+  .accessory-btn {
+    width: 100px;
+    height: 100px;
+    font-size: 50px;
+    border-radius: 20px;
+    background: #fff;
+    border: 4px solid #333;
+    cursor: pointer;
+  }
+  .accessory-btn.selected {
+    background: #8ac926;
+  }
+  #customize-back {
+    font-size: 22px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  /* reward popup */
+  #reward-box {
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 5px solid #333;
+    border-radius: 20px;
+    padding: 30px 40px;
+    z-index: 30;
+    text-align: center;
+  }
+  #reward-box h2 {
+    font-size: 32px;
+    margin: 0 0 10px 0;
+  }
+  #reward-icon {
+    font-size: 80px;
+  }
+  #reward-ok {
+    display: block;
+    margin: 20px auto 0;
+    font-size: 22px;
+    padding: 8px 20px;
+    cursor: pointer;
+  }
+
+  /* all-done celebration */
+  #celebrate-box {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    text-align: center;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.85);
+  }
+  #celebrate-box h2 {
+    margin-top: 40vh;
+    font-size: 40px;
+    position: relative;
+  }
+  #celebrate-box button {
+    font-size: 24px;
+    padding: 10px 24px;
+    cursor: pointer;
+    margin-top: 20px;
+    position: relative;
+  }
+  #celebrate-particles {
+    position: absolute;
+    inset: 0;
+  }
+  .confetti-piece {
+    position: absolute;
+    top: -60px;
+    font-size: 40px;
+    animation: confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0.9; }
+  }
+
+  /* happiness meter */
+  #meter-wrap {
+    width: 400px;
+    height: 40px;
+    margin: 20px auto;
+    background: #fff;
+    border: 4px solid #333;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  #meter-fill {
+    height: 100%;
+    width: 20%;
+    background: #e63946;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+  #meter-label {
+    font-size: 24px;
+  }
+
+  /* party challenge screen */
+  #party-screen {
+    display: none;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .balloon {
+    position: absolute;
+    width: 90px;
+    height: 110px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    border: 3px solid #333;
+    cursor: pointer;
+    user-select: none;
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    width: 3px;
+    height: 14px;
+    background: #333;
+    transform: translateX(-50%);
+  }
+  .timer-badge {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 36px;
+    background: #fff;
+    border: 4px solid #333;
+    border-radius: 16px;
+    padding: 6px 20px;
+    z-index: 10;
+  }
+  .fail-box {
+    display: none;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 5px solid #333;
+    border-radius: 20px;
+    padding: 30px 40px;
+    z-index: 20;
+  }
+  .fail-box h2 {
+    font-size: 40px;
+    margin: 0 0 20px 0;
+  }
+  .restart-btn {
+    font-size: 24px;
+    padding: 10px 24px;
+    cursor: pointer;
+  }
+
+  /* obstacle course difficulty picker */
+  #obstacle-difficulty-screen {
+    display: none;
+  }
+  #obstacle-difficulty-screen h1 {
+    font-size: 40px;
+    margin-top: 40px;
+  }
+  .difficulty-btn {
+    display: block;
+    width: 320px;
+    margin: 15px auto;
+    font-size: 26px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 4px solid #333;
+    background: #fff;
+    cursor: pointer;
+  }
+  .difficulty-btn.ultimate {
+    background: #ffd166;
+  }
+  .difficulty-btn.masters {
+    background: #ff595e;
+    color: #fff;
+  }
+
+  /* obstacle course challenge screen */
+  #obstacle-screen {
+    display: none;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+  }
+  #obstacle-scene {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 100px;
+  }
+  #obstacle-bubble {
+    position: relative;
+    background: #fff;
+    border: 4px solid #333;
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+  }
+  #obstacle-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 30px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: #fff;
+    border-bottom: 0;
+  }
+  #obstacle-target {
+    display: flex;
+    gap: 10px;
+    font-size: 40px;
+  }
+  .target-piece {
+    opacity: 0.35;
+  }
+  .target-piece.placed {
+    opacity: 1;
+  }
+  #obstacle-owner {
+    font-size: 120px;
+    line-height: 1;
+  }
+  #obstacle-build-area {
+    position: relative;
+    display: inline-block;
+    min-width: 260px;
+    min-height: 160px;
+  }
+  #obstacle-built {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    font-size: 50px;
+    min-height: 60px;
+  }
+  #obstacle-cat {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 120px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .accessory-btn.wrong {
+    background: #ff595e;
+  }
+
+  /* shop run challenge screen */
+  #shop-screen {
+    display: none;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 90px;
+  }
+  #shop-hint {
+    text-align: center;
+    font-size: 16px;
+    margin: 6px 0 10px;
+    color: #555;
+  }
+  #shop-grid {
+    position: relative;
+    width: 100%;
+    height: 78vh;
+    display: grid;
+    border: 5px solid #333;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: background 0.15s ease;
+  }
+  #shop-grid.wrong-flash {
+    background: #ff595e;
+  }
+  .shop-tile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+    line-height: 1;
+  }
+  .shop-tile.floor {
+    background: #fdf3e3;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 22px;
+  }
+  .shop-tile.wall {
+    background: repeating-linear-gradient(to bottom, #8b5e34 0px, #8b5e34 8px, #d9a066 8px, #d9a066 40px);
+    font-size: 15px;
+    color: #3a2412;
+  }
+  .shop-cell-item {
+    font-size: 20px;
+  }
+  #shop-player {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    transition: left 0.12s linear, top 0.12s linear;
+    z-index: 5;
+    pointer-events: none;
+  }
+  #shop-list {
+    position: fixed;
+    top: 110px;
+    right: 14px;
+    font-size: 18px;
+    text-align: left;
+    background: #fff;
+    border: 3px solid #333;
+    border-radius: 16px;
+    padding: 10px 16px;
+    min-width: 150px;
+    max-width: 180px;
+    z-index: 6;
+  }
+  #shop-list .shop-item {
+    display: block;
+    margin: 6px 0;
+  }
+  .shop-item.collected {
+    opacity: 0.3;
+    text-decoration: line-through;
+  }
+
+  #obstacle-done-btn {
+    font-size: 24px;
+    padding: 10px 24px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  #obstacle-done-btn.wrong {
+    background: #ff595e;
+  }
+</style>
+</head>
+<body>
+
+  <div id="main-screen">
+    <h1>Cat Catastrophe Run</h1>
+
+    <div id="meter-label">Happiness ❤️</div>
+    <div id="meter-wrap">
+      <div id="meter-fill"></div>
+    </div>
+
+    <div id="challenges">
+      <button class="challenge-btn" title="Party" onclick="startParty()">🎈🐱</button>
+      <button class="challenge-btn" title="Obstacle Course" onclick="startObstacle()">🏃🐱</button>
+      <button class="challenge-btn" title="Shop Run" onclick="startShop()">🛒🐱</button>
+      <button class="challenge-btn" title="Customize" onclick="openCustomize()">🎨🐱</button>
+    </div>
+
+    <div id="cat">🐱<span id="equipped"></span></div>
+    <div id="owner"><span id="owner-display">🧑</span></div>
+  </div>
+
+  <div id="customize-screen">
+    <h1>Customize</h1>
+    <div id="category-btns">
+      <button class="category-btn" id="cat-category-btn" onclick="showCategory('cat')">🐱 Cat</button>
+      <button class="category-btn" id="owner-category-btn" onclick="showCategory('owner')">🧑 Owner</button>
+    </div>
+    <h2 id="customize-subtitle"></h2>
+    <div id="accessory-list"></div>
+    <p id="no-accessories" style="display:none;">No accessories yet — win a challenge to get some!</p>
+
+    <div id="owner-categories" style="display:none;">
+      <div id="owner-item-list"></div>
+      <p id="owner-empty" style="display:none;">Nothing built here yet — tell Clawsome to make this one next!</p>
+    </div>
+
+    <button id="customize-back" onclick="closeCustomize()">Back</button>
+  </div>
+
+  <div id="party-screen">
+    <div id="party-timer" class="timer-badge">30</div>
+    <div id="fail-box" class="fail-box">
+      <h2>Oops, you failed!</h2>
+      <button id="restart-btn" class="restart-btn" onclick="restartGame()">Restart Game</button>
+    </div>
+  </div>
+
+  <div id="obstacle-difficulty-screen">
+    <h1>Obstacle Course</h1>
+    <p>Pick your challenge:</p>
+    <button class="difficulty-btn" onclick="beginObstacle(15)">Normal — 15s</button>
+    <button class="difficulty-btn ultimate" onclick="beginObstacle(10)">Ultimate — 10s</button>
+    <button class="difficulty-btn masters" onclick="beginObstacle(5)">Ultimate Ultimate — 5s (masters only)</button>
+  </div>
+
+  <div id="obstacle-screen">
+    <div id="obstacle-timer" class="timer-badge">30</div>
+    <div id="obstacle-scene">
+      <div id="obstacle-bubble">
+        <div id="obstacle-target"></div>
+      </div>
+      <div id="obstacle-build-area">
+        <div id="obstacle-built"></div>
+        <div id="obstacle-cat">🐱</div>
+      </div>
+      <div id="obstacle-owner">🧑</div>
+    </div>
+    <div id="obstacle-pieces"></div>
+    <button id="obstacle-done-btn" onclick="finishObstacle()">Done ✅</button>
+    <div id="obstacle-fail-box" class="fail-box">
+      <h2>Oops, you failed!</h2>
+      <button class="restart-btn" onclick="restartGame()">Restart Game</button>
+    </div>
+  </div>
+
+  <div id="shop-screen">
+    <div id="shop-timer" class="timer-badge">120</div>
+    <div id="shop-hint">Use the arrow keys to walk around and bump into everything on your list!</div>
+    <div id="shop-grid"></div>
+    <div id="shop-list"></div>
+    <div id="shop-fail-box" class="fail-box">
+      <h2>Oops, you failed!</h2>
+      <button class="restart-btn" onclick="restartGame()">Restart Game</button>
+    </div>
+  </div>
+
+  <div id="reward-box">
+    <h2>Treasure chest! 🎁</h2>
+    <div id="reward-icon"></div>
+    <p><span id="reward-count">2</span> new accessories! The newest one is already on your cat.</p>
+    <button id="reward-ok" onclick="closeReward()">Nice!</button>
+  </div>
+
+  <div id="celebrate-box">
+    <div id="celebrate-particles"></div>
+    <h2>All done! You got them all! 🎉</h2>
+    <button onclick="closeCelebrate()">Yay!</button>
+  </div>
+
+  <script>
+    const START_HAPPINESS = 0;
+    const CHALLENGE_SHARE = 100 / 3; // each fully completed challenge = one third
+    let happiness = START_HAPPINESS;
+    const meterFill = document.getElementById('meter-fill');
+    const BALLOON_COLORS = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff924c'];
+
+    const ACCESSORY_ICONS = ['🎀', '👑', '🧣', '🕶️', '🎩', '🐾'];
+    let accessories = [];
+    let equippedAccessory = '';
+
+    function openCustomize() {
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('customize-screen').style.display = 'block';
+      showCategory('cat');
+    }
+
+    function showCategory(category) {
+      document.getElementById('cat-category-btn').classList.toggle('active', category === 'cat');
+      document.getElementById('owner-category-btn').classList.toggle('active', category === 'owner');
+
+      const list = document.getElementById('accessory-list');
+      const subtitle = document.getElementById('customize-subtitle');
+      const ownerCategories = document.getElementById('owner-categories');
+      const noAccessories = document.getElementById('no-accessories');
+
+      if (category === 'cat') {
+        subtitle.textContent = "Your cat's accessories";
+        ownerCategories.style.display = 'none';
+        list.style.display = 'flex';
+        list.innerHTML = '';
+        noAccessories.style.display = accessories.length === 0 ? 'block' : 'none';
+        accessories.forEach(icon => {
+          const btn = document.createElement('button');
+          btn.className = 'accessory-btn';
+          if (icon === equippedAccessory) btn.classList.add('selected');
+          btn.textContent = icon;
+          btn.onclick = () => {
+            equippedAccessory = icon;
+            document.getElementById('equipped').textContent = equippedAccessory;
+            list.querySelectorAll('.accessory-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          };
+          list.appendChild(btn);
+        });
+      } else {
+        subtitle.textContent = 'Owner';
+        list.style.display = 'none';
+        noAccessories.style.display = 'none';
+        ownerCategories.style.display = 'block';
+        showOwnerHairList();
+      }
+    }
+
+    // Owner customization — hairstyles only, everything unlocked from the start
+    const OWNER_HAIR_ITEMS = [
+      '👱‍♀️', '👱‍♂️', '👩‍🦰', '👨‍🦰', '👩‍🦱', '👨‍🦱',
+      '👩‍🦳', '👨‍🦳', '👩‍🦲', '👨‍🦲', '🧑‍🦰', '🧑‍🦱', '🧑‍🦳', '🧑‍🦲',
+    ];
+    const equippedOwner = { hair: '' };
+
+    function showOwnerHairList() {
+      const itemList = document.getElementById('owner-item-list');
+      const empty = document.getElementById('owner-empty');
+      itemList.innerHTML = '';
+      empty.style.display = 'none';
+      OWNER_HAIR_ITEMS.forEach(icon => {
+        const btn = document.createElement('button');
+        btn.className = 'accessory-btn';
+        if (icon === equippedOwner.hair) btn.classList.add('selected');
+        btn.textContent = icon;
+        btn.onclick = () => {
+          equippedOwner.hair = icon;
+          updateOwnerDisplay();
+          itemList.querySelectorAll('.accessory-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        };
+        itemList.appendChild(btn);
+      });
+    }
+
+    // Hair emoji already includes a full head, so picking one replaces the
+    // plain default person entirely — same way an accessory sits on the cat.
+    function updateOwnerDisplay() {
+      const display = document.getElementById('owner-display');
+      display.textContent = equippedOwner.hair || '🧑';
+    }
+
+    function closeCustomize() {
+      document.getElementById('customize-screen').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+    }
+
+    function closeReward() {
+      document.getElementById('reward-box').style.display = 'none';
+      document.getElementById('obstacle-screen').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      if (happiness >= 100 && !allDoneCelebrated) {
+        allDoneCelebrated = true;
+        celebrateAllDone();
+      }
+    }
+
+    const CONFETTI_ICONS = ['🎈', '🎉', '🎆', '✨', '🎊'];
+    let allDoneCelebrated = false;
+
+    function celebrateAllDone() {
+      const particles = document.getElementById('celebrate-particles');
+      particles.innerHTML = '';
+      for (let i = 0; i < 30; i++) {
+        const span = document.createElement('span');
+        span.className = 'confetti-piece';
+        span.textContent = CONFETTI_ICONS[Math.floor(Math.random() * CONFETTI_ICONS.length)];
+        span.style.left = Math.random() * 100 + '%';
+        span.style.animationDelay = (Math.random() * 1.5) + 's';
+        span.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        particles.appendChild(span);
+      }
+      document.getElementById('celebrate-box').style.display = 'block';
+    }
+
+    function closeCelebrate() {
+      document.getElementById('celebrate-box').style.display = 'none';
+    }
+
+    function setHappiness(value) {
+      happiness = Math.max(0, Math.min(100, value));
+      meterFill.style.width = happiness + '%';
+      meterFill.style.background = happiness >= 100 ? '#2ecc71' : '#e63946';
+    }
+    setHappiness(happiness);
+
+    const BALLOON_COUNT = 8;
+    const BALLOON_SIZE = 110;
+    const SPEED = 60; // pixels per second
+    let balloons = [];
+    let animId = null;
+    let timerId = null;
+    let lastFrame = 0;
+
+    function startParty() {
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('fail-box').style.display = 'none';
+      const partyScreen = document.getElementById('party-screen');
+      partyScreen.style.display = 'block';
+
+      balloons = [];
+      for (let i = 0; i < BALLOON_COUNT; i++) {
+        const el = document.createElement('div');
+        el.className = 'balloon';
+        el.style.background = BALLOON_COLORS[i % BALLOON_COLORS.length];
+        partyScreen.appendChild(el);
+
+        const angle = Math.random() * Math.PI * 2;
+        const balloon = {
+          el,
+          x: Math.random() * (window.innerWidth - BALLOON_SIZE),
+          y: Math.random() * (window.innerHeight - BALLOON_SIZE),
+          vx: Math.cos(angle) * SPEED,
+          vy: Math.sin(angle) * SPEED,
+        };
+        el.onclick = () => popBalloon(balloon);
+        balloons.push(balloon);
+      }
+
+      lastFrame = performance.now();
+      animId = requestAnimationFrame(moveBalloons);
+
+      let timeLeft = 30;
+      document.getElementById('party-timer').textContent = timeLeft;
+      timerId = setInterval(() => {
+        timeLeft--;
+        document.getElementById('party-timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          failParty();
+        }
+      }, 1000);
+    }
+
+    function moveBalloons(now) {
+      const dt = (now - lastFrame) / 1000;
+      lastFrame = now;
+      const maxX = window.innerWidth - BALLOON_SIZE;
+      const maxY = window.innerHeight - BALLOON_SIZE;
+
+      balloons.forEach(b => {
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < 0 || b.x > maxX) { b.vx *= -1; b.x = Math.max(0, Math.min(maxX, b.x)); }
+        if (b.y < 0 || b.y > maxY) { b.vy *= -1; b.y = Math.max(0, Math.min(maxY, b.y)); }
+        b.el.style.left = b.x + 'px';
+        b.el.style.top = b.y + 'px';
+      });
+
+      animId = requestAnimationFrame(moveBalloons);
+    }
+
+    function popBalloon(balloon) {
+      balloon.el.remove();
+      balloons = balloons.filter(b => b !== balloon);
+      if (balloons.length === 0) {
+        setHappiness(happiness + CHALLENGE_SHARE);
+        awardAccessory(2);
+        endParty();
+      }
+    }
+
+    function awardAccessory(count) {
+      // Prefer accessories not already owned so wins feel new; only reuse an
+      // owned icon once every fresh option has been handed out. Never repeat
+      // an icon within the same prize (that's what caused double crowns).
+      const notOwned = ACCESSORY_ICONS.filter(icon => !accessories.includes(icon));
+      const pool = notOwned.length > 0 ? notOwned.slice() : ACCESSORY_ICONS.slice();
+      const won = [];
+      while (won.length < count) {
+        if (pool.length === 0) pool.push(...ACCESSORY_ICONS.filter(icon => !won.includes(icon)));
+        const idx = Math.floor(Math.random() * pool.length);
+        won.push(pool[idx]);
+        pool.splice(idx, 1);
+      }
+      accessories.push(...won);
+      equippedAccessory = won[won.length - 1];
+      document.getElementById('equipped').textContent = equippedAccessory;
+      document.getElementById('reward-icon').textContent = won.join(' ');
+      document.getElementById('reward-count').textContent = won.length;
+      document.getElementById('reward-box').style.display = 'block';
+    }
+
+    function endParty() {
+      clearInterval(timerId);
+      cancelAnimationFrame(animId);
+      document.querySelectorAll('.balloon').forEach(b => b.remove());
+      balloons = [];
+      document.getElementById('party-screen').style.display = 'none';
+      // main-screen is revealed by closeReward() once the treasure chest popup is dismissed
+    }
+
+    function failParty() {
+      clearInterval(timerId);
+      cancelAnimationFrame(animId);
+      document.querySelectorAll('.balloon').forEach(b => b.remove());
+      balloons = [];
+      document.getElementById('fail-box').style.display = 'block';
+    }
+
+    const OBSTACLE_PIECES = ['🧱', '🪜', '🚧', '🛞', '🪵', '🎯', '🪣', '🚩', '🪤', '🧰', '🔨', '🪚'];
+    const OBSTACLE_TARGET_COUNT = 4;
+    const OBSTACLE_DECOY_COUNT = 6;
+    let obstacleTarget = [];
+    let obstacleProgress = 0;
+    let obstacleTimerId = null;
+
+    function startObstacle() {
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('obstacle-difficulty-screen').style.display = 'block';
+    }
+
+    function beginObstacle(seconds) {
+      document.getElementById('obstacle-difficulty-screen').style.display = 'none';
+      document.getElementById('obstacle-fail-box').style.display = 'none';
+      document.getElementById('obstacle-screen').style.display = 'block';
+      document.getElementById('obstacle-pieces').style.display = 'flex';
+      document.getElementById('obstacle-done-btn').style.display = 'inline-block';
+      document.getElementById('obstacle-built').innerHTML = '';
+
+      const shuffledPieces = OBSTACLE_PIECES.slice().sort(() => Math.random() - 0.5);
+      obstacleTarget = shuffledPieces.slice(0, OBSTACLE_TARGET_COUNT);
+      obstacleProgress = 0;
+      document.getElementById('obstacle-target').innerHTML = obstacleTarget
+        .map(icon => '<span class="target-piece">' + icon + '</span>')
+        .join('');
+
+      const decoys = OBSTACLE_PIECES.filter(icon => !obstacleTarget.includes(icon))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, OBSTACLE_DECOY_COUNT);
+      const tray = obstacleTarget.concat(decoys).sort(() => Math.random() - 0.5);
+
+      const pieceList = document.getElementById('obstacle-pieces');
+      pieceList.innerHTML = '';
+      tray.forEach(icon => {
+        const btn = document.createElement('button');
+        btn.className = 'accessory-btn';
+        btn.textContent = icon;
+        btn.onclick = () => tapObstaclePiece(icon, btn);
+        pieceList.appendChild(btn);
+      });
+
+      let timeLeft = seconds;
+      document.getElementById('obstacle-timer').textContent = timeLeft;
+      obstacleTimerId = setInterval(() => {
+        timeLeft--;
+        document.getElementById('obstacle-timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          failObstacle();
+        }
+      }, 1000);
+    }
+
+    function tapObstaclePiece(icon, btn) {
+      if (btn.classList.contains('selected')) return;
+      if (icon === obstacleTarget[obstacleProgress]) {
+        btn.classList.add('selected');
+        document.querySelectorAll('#obstacle-target .target-piece')[obstacleProgress].classList.add('placed');
+        obstacleProgress++;
+      } else {
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 300);
+      }
+    }
+
+    function finishObstacle() {
+      const doneBtn = document.getElementById('obstacle-done-btn');
+      if (obstacleProgress < obstacleTarget.length) {
+        doneBtn.classList.add('wrong');
+        setTimeout(() => doneBtn.classList.remove('wrong'), 300);
+        return;
+      }
+      clearInterval(obstacleTimerId);
+      document.getElementById('obstacle-built').innerHTML = obstacleTarget
+        .map(icon => '<span>' + icon + '</span>')
+        .join('');
+      document.getElementById('obstacle-pieces').style.display = 'none';
+      doneBtn.style.display = 'none';
+      setHappiness(happiness + CHALLENGE_SHARE);
+      awardAccessory(3);
+      // obstacle-screen stays visible (built course + cat on top) behind the
+      // reward popup; closeReward() hides it once the popup is dismissed.
+    }
+
+    function failObstacle() {
+      clearInterval(obstacleTimerId);
+      document.getElementById('obstacle-fail-box').style.display = 'block';
+    }
+
+    const SHOP_MAZE = [
+      '###########',
+      '#...#.....#',
+      '#.#.#.###.#',
+      '#.#...#...#',
+      '#.#.#.#.#.#',
+      '#...#...#.#',
+      '###.###.#.#',
+      '#.......#.#',
+      '###########',
+    ];
+    const SHOP_ROWS = SHOP_MAZE.length;
+    const SHOP_COLS = SHOP_MAZE[0].length;
+    const SHOP_START = { r: 1, c: 1 };
+    const SHOP_ITEM_POOL = [
+      { icon: '🥫', name: 'Cat food' },
+      { icon: '🐟', name: 'Fish' },
+      { icon: '🥛', name: 'Milk' },
+      { icon: '🧶', name: 'Yarn' },
+      { icon: '🧸', name: 'Toy' },
+      { icon: '🧻', name: 'Litter' },
+      { icon: '🍗', name: 'Treats' },
+      { icon: '🪮', name: 'Brush' },
+      { icon: '🛏️', name: 'Bed' },
+      { icon: '🎾', name: 'Ball' },
+    ];
+    const SHOP_DECOY_ICONS = ['🧦', '👟', '🔧', '📚', '🍌', '🔑'];
+    const SHOP_CLUTTER_ICONS = ['📦', '🥖', '🍞', '🥕', '🍎', '🧃', '🧴', '🪥', '🧼', '🥫'];
+
+    let shopPlayer = { r: SHOP_START.r, c: SHOP_START.c };
+    let shopItemsState = [];
+    let shopDecoyState = [];
+    let shopCollectedCount = 0;
+    let shopTimerId = null;
+    let shopTimeLeft = 0;
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function isOpenCell(r, c) {
+      if (r < 0 || r >= SHOP_MAZE.length) return false;
+      const row = SHOP_MAZE[r];
+      if (c < 0 || c >= row.length) return false;
+      return row[c] !== '#';
+    }
+
+    function wallHasFloorNeighbor(r, c) {
+      return [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dr, dc]) => {
+        const fr = r + dr, fc = c + dc;
+        if (fr < 0 || fr >= SHOP_ROWS || fc < 0 || fc >= SHOP_COLS) return false;
+        return SHOP_MAZE[fr][fc] !== '#';
+      });
+    }
+
+    function buildShopGrid() {
+      const grid = document.getElementById('shop-grid');
+      grid.style.gridTemplateColumns = 'repeat(' + SHOP_COLS + ', 1fr)';
+      grid.style.gridTemplateRows = 'repeat(' + SHOP_ROWS + ', 1fr)';
+      grid.innerHTML = '';
+      for (let r = 0; r < SHOP_ROWS; r++) {
+        for (let c = 0; c < SHOP_COLS; c++) {
+          const tile = document.createElement('div');
+          const isWall = SHOP_MAZE[r][c] === '#';
+          tile.className = 'shop-tile ' + (isWall ? 'wall' : 'floor');
+          tile.id = 'shop-tile-' + r + '-' + c;
+          if (isWall && !wallHasFloorNeighbor(r, c)) {
+            const clutterCount = 1 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < clutterCount; i++) {
+              const span = document.createElement('span');
+              span.className = 'shop-clutter';
+              span.textContent = SHOP_CLUTTER_ICONS[Math.floor(Math.random() * SHOP_CLUTTER_ICONS.length)];
+              tile.appendChild(span);
+            }
+          }
+          grid.appendChild(tile);
+        }
+      }
+      const player = document.createElement('div');
+      player.id = 'shop-player';
+      grid.appendChild(player);
+    }
+
+    function getShelfSpots() {
+      const candidates = [];
+      for (let r = 0; r < SHOP_ROWS; r++) {
+        for (let c = 0; c < SHOP_COLS; c++) {
+          if (SHOP_MAZE[r][c] !== '#') continue;
+          if (wallHasFloorNeighbor(r, c)) candidates.push({ r, c });
+        }
+      }
+      return shuffle(candidates);
+    }
+
+    function positionShopPlayer() {
+      const player = document.getElementById('shop-player');
+      player.style.width = (100 / SHOP_COLS) + '%';
+      player.style.height = (100 / SHOP_ROWS) + '%';
+      player.style.left = (shopPlayer.c / SHOP_COLS * 100) + '%';
+      player.style.top = (shopPlayer.r / SHOP_ROWS * 100) + '%';
+      player.textContent = equippedOwner.hair || '🧑';
+    }
+
+    function startShop() {
+      document.getElementById('main-screen').style.display = 'none';
+      document.getElementById('shop-fail-box').style.display = 'none';
+      document.getElementById('shop-screen').style.display = 'block';
+
+      shopPlayer = { r: SHOP_START.r, c: SHOP_START.c };
+      shopCollectedCount = 0;
+
+      buildShopGrid();
+      positionShopPlayer();
+
+      const chosenItems = shuffle(SHOP_ITEM_POOL).slice(0, 5);
+      const spots = getShelfSpots();
+      shopItemsState = chosenItems.map((def, idx) => ({
+        icon: def.icon, name: def.name, idx,
+        r: spots[idx].r, c: spots[idx].c, collected: false,
+      }));
+      const decoySpots = spots.slice(chosenItems.length);
+      shopDecoyState = decoySpots.map((spot, i) => ({
+        icon: SHOP_DECOY_ICONS[Math.floor(Math.random() * SHOP_DECOY_ICONS.length)], idx: i,
+        r: spot.r, c: spot.c, collected: false,
+      }));
+
+      shopItemsState.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'shop-cell-item';
+        span.id = 'shop-shelf-item-' + item.idx;
+        span.textContent = item.icon;
+        document.getElementById('shop-tile-' + item.r + '-' + item.c).appendChild(span);
+      });
+      shopDecoyState.forEach(decoy => {
+        const span = document.createElement('span');
+        span.className = 'shop-cell-item';
+        span.id = 'shop-shelf-decoy-' + decoy.idx;
+        span.textContent = decoy.icon;
+        document.getElementById('shop-tile-' + decoy.r + '-' + decoy.c).appendChild(span);
+      });
+
+      const list = document.getElementById('shop-list');
+      list.innerHTML = shopItemsState
+        .map(item => '<span class="shop-item" id="shop-list-' + item.idx + '">' + item.icon + ' ' + item.name + '</span>')
+        .join('');
+
+      shopTimeLeft = 120;
+      document.getElementById('shop-timer').textContent = shopTimeLeft;
+      clearInterval(shopTimerId);
+      shopTimerId = setInterval(() => {
+        shopTimeLeft--;
+        document.getElementById('shop-timer').textContent = shopTimeLeft;
+        if (shopTimeLeft <= 0) failShop();
+      }, 1000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('shop-screen').style.display !== 'block') return;
+      if (e.key === 'ArrowUp') { e.preventDefault(); shopMove(-1, 0); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); shopMove(1, 0); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); shopMove(0, -1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); shopMove(0, 1); }
+    });
+
+    function shopMove(dr, dc) {
+      const nr = shopPlayer.r + dr;
+      const nc = shopPlayer.c + dc;
+      if (!isOpenCell(nr, nc)) {
+        bumpShelfAt(nr, nc);
+        return;
+      }
+      shopPlayer = { r: nr, c: nc };
+      positionShopPlayer();
+    }
+
+    function bumpShelfAt(r, c) {
+      const item = shopItemsState.find(it => it.r === r && it.c === c && !it.collected);
+      if (item) {
+        item.collected = true;
+        const span = document.getElementById('shop-shelf-item-' + item.idx);
+        if (span) span.remove();
+        document.getElementById('shop-list-' + item.idx).classList.add('collected');
+        shopCollectedCount++;
+        if (shopCollectedCount === shopItemsState.length) {
+          winShop();
+        }
+        return;
+      }
+      const decoy = shopDecoyState.find(d => d.r === r && d.c === c && !d.collected);
+      if (decoy) {
+        decoy.collected = true;
+        const span = document.getElementById('shop-shelf-decoy-' + decoy.idx);
+        if (span) span.remove();
+        wrongPickup();
+      }
+    }
+
+    function wrongPickup() {
+      const grid = document.getElementById('shop-grid');
+      grid.classList.add('wrong-flash');
+      setTimeout(() => grid.classList.remove('wrong-flash'), 300);
+      shopTimeLeft = Math.max(0, shopTimeLeft - 5);
+      document.getElementById('shop-timer').textContent = shopTimeLeft;
+      if (shopTimeLeft <= 0) failShop();
+    }
+
+    function winShop() {
+      clearInterval(shopTimerId);
+      setHappiness(happiness + CHALLENGE_SHARE);
+      awardAccessory(4);
+      document.getElementById('shop-screen').style.display = 'none';
+      // main-screen is revealed by closeReward() once the treasure chest popup is dismissed
+    }
+
+    function failShop() {
+      clearInterval(shopTimerId);
+      document.getElementById('shop-fail-box').style.display = 'block';
+    }
+
+    function restartGame() {
+      document.getElementById('fail-box').style.display = 'none';
+      document.getElementById('party-screen').style.display = 'none';
+      document.getElementById('obstacle-fail-box').style.display = 'none';
+      document.getElementById('obstacle-screen').style.display = 'none';
+      document.getElementById('obstacle-difficulty-screen').style.display = 'none';
+      document.getElementById('shop-fail-box').style.display = 'none';
+      document.getElementById('shop-screen').style.display = 'none';
+      clearInterval(obstacleTimerId);
+      clearInterval(shopTimerId);
+      document.getElementById('celebrate-box').style.display = 'none';
+      allDoneCelebrated = false;
+      document.getElementById('main-screen').style.display = 'block';
+      setHappiness(START_HAPPINESS);
+      accessories = [];
+      equippedAccessory = '';
+      document.getElementById('equipped').textContent = '';
+
+      equippedOwner.hair = '';
+      updateOwnerDisplay();
+    }
+  </script>
+</body>
+</html>
