@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cat Catastrophe Run</title>
 <style>
   body {
@@ -386,7 +387,7 @@
   #shop-grid {
     position: relative;
     width: 100%;
-    height: 78vh;
+    height: 62vh;
     display: grid;
     border: 5px solid #333;
     border-radius: 12px;
@@ -396,6 +397,33 @@
   #shop-grid.wrong-flash {
     background: #ff595e;
   }
+  #shop-dpad {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 16px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .shop-dpad-btn {
+    font-size: 30px;
+    border: 3px solid #333;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .shop-dpad-btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+  }
+  .shop-dpad-up { grid-column: 2; grid-row: 1; }
+  .shop-dpad-left { grid-column: 1; grid-row: 2; }
+  .shop-dpad-right { grid-column: 3; grid-row: 2; }
+  .shop-dpad-down { grid-column: 2; grid-row: 3; }
   .shop-tile {
     position: relative;
     display: flex;
@@ -416,7 +444,7 @@
     color: #3a2412;
   }
   .shop-cell-item {
-    font-size: 20px;
+    font-size: 30px;
   }
   #shop-player {
     position: absolute;
@@ -539,9 +567,15 @@
 
   <div id="shop-screen">
     <div id="shop-timer" class="timer-badge">120</div>
-    <div id="shop-hint">Use the arrow keys to walk around and bump into everything on your list!</div>
+    <div id="shop-hint">Use the arrow keys (or the buttons below) to walk around and bump into everything on your list!</div>
     <div id="shop-grid"></div>
     <div id="shop-list"></div>
+    <div id="shop-dpad">
+      <button class="shop-dpad-btn shop-dpad-up" onclick="shopMove(-1, 0)">⬆️</button>
+      <button class="shop-dpad-btn shop-dpad-left" onclick="shopMove(0, -1)">⬅️</button>
+      <button class="shop-dpad-btn shop-dpad-right" onclick="shopMove(0, 1)">➡️</button>
+      <button class="shop-dpad-btn shop-dpad-down" onclick="shopMove(1, 0)">⬇️</button>
+    </div>
     <div id="shop-fail-box" class="fail-box">
       <h2>Oops, you failed!</h2>
       <button class="restart-btn" onclick="restartGame()">Restart Game</button>
